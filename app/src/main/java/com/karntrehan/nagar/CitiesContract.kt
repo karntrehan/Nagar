@@ -8,7 +8,6 @@ import com.karntrehan.nagar.data.entities.CityEntity
  */
 interface CitiesContract {
     interface Repository{
-        fun getCities(offset: Int,limit: Int = 10) : LiveData<List<CityEntity>>
-        fun saveCities(cities: List<CityEntity>)
+        fun getCities(offset: Int) : LiveData<List<CityEntity>>
     }
 }

@@ -22,17 +22,9 @@ class CitiesViewModel : ViewModel() {
 
     val cities: LiveData<List<CityEntity>> = Transformations.switchMap(lastPosition)
     { position ->
-        Log.d(TAG,"SwitchMap : $position")
-        citiesRepository.getCities(offset = position) }
+        citiesRepository.getCities(offset = position)
+    }
 
-    /*//FIXME
-    fun saveTemp()
-    {
-        val citiesAL = ArrayList<CityEntity>()
-        (1..100).mapTo(citiesAL) { CityEntity(it, "City $it", "Slug $it") }
-        Log.d(TAG,citiesAL.toString())
-        citiesRepository.saveCities(citiesAL)
-    }*/
 
     fun setInput(position: Int) {
         lastPosition.value = position

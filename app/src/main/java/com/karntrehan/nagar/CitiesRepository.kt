@@ -2,11 +2,11 @@ package com.karntrehan.nagar
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
+import android.content.SharedPreferences
 import android.util.Log
 import com.karntrehan.nagar.data.CityDao
 import com.karntrehan.nagar.data.entities.CitiesResponse
 import com.karntrehan.nagar.data.entities.CityEntity
-import dagger.Provides
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -20,28 +20,25 @@ import javax.inject.Singleton
 @Singleton
 class CitiesRepository @Inject constructor(
         val cityDao: CityDao,
-        val citiesService: CitiesService
+        val citiesService: CitiesService,
+        val preferences: SharedPreferences
 ) : CitiesContract.Repository {
 
     val TAG = "CitiesRepo"
+    val LIMIT = 10
 
-    override fun saveCities(cities: List<CityEntity>) {
-        cityDao.insertAllCities(cities)
-    }
+    override fun getCities(offset: Int): LiveData<List<CityEntity>> {
+        Log.d(TAG, "Get cities O:$offset")
 
-    override fun getCities(offset: Int, limit: Int): LiveData<List<CityEntity>> {
-        val result = cityDao.loadAllCities(offset, limit)
+        if (preferences.getBoolean(Constants.MORE_REMOTE_CITIES, true))
+            getRemoteCities(offset, LIMIT)
 
-        Log.d(TAG, "From DB: " + result.value.toString())
-
-        if (result.value?.size ?: 0 < 10)
-            goRemoteCities(offset, limit)
-
+        val result: LiveData<List<CityEntity>> = cityDao.loadLocalCities(offset, LIMIT)
         return result
     }
 
-    private fun goRemoteCities(offset: Int, limit: Int) {
-        Log.d(TAG, "getRemoteCities")
+    private fun getRemoteCities(offset: Int, limit: Int) {
+        Log.d(TAG, "getRemoteCities $offset")
 
         val call: Call<CitiesResponse> = citiesService.getCities(limit, offset)
         call.enqueue(object : Callback<CitiesResponse> {
@@ -50,10 +47,16 @@ class CitiesRepository @Inject constructor(
                     val citiesResponse = response.body()
                     Log.d(TAG, "Success: " + citiesResponse.toString())
 
-
+                    if (citiesResponse == null)
+                        return
 
                     Thread(Runnable {
-                        cityDao.insertAllCities(citiesResponse?.cities)
+                        cityDao.insertAllCities(citiesResponse.cities)
+                        preferences
+                                .edit()
+                                .putBoolean(Constants.MORE_REMOTE_CITIES,
+                                        citiesResponse.cities.isEmpty())
+                                .apply()
                     }).start()
                 }
             }

@@ -33,8 +33,6 @@ internal class CitiesAdapter(private val context: Context) : RecyclerView.Adapte
     }
 
     fun addItems(lastPosition: Int, items: List<CityEntity>?) {
-        Log.d(TAG, "lastPosition $lastPosition")
-
         if (items == null)
             return
 
@@ -44,10 +42,12 @@ internal class CitiesAdapter(private val context: Context) : RecyclerView.Adapte
 
         this.items.addAll(items)
 
-        Log.d(TAG, "List ${this.items}")
-        Log.d(TAG, "List ${this.items.size}")
+        //Log.d(TAG, "List ${this.items.size}")
 
         this.items.add(LoadingEntity())
+
+        Log.d(TAG, "List ${this.items}")
+
         notifyDataSetChanged()
     }
 

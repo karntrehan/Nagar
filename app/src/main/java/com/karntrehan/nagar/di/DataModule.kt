@@ -2,6 +2,8 @@ package com.karntrehan.nagar.di
 
 import android.arch.persistence.room.Room
 import android.content.Context
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import com.karntrehan.nagar.data.NagarDb
 import dagger.Module
 import dagger.Provides
@@ -12,6 +14,11 @@ import javax.inject.Singleton
  */
 @Module(includes = arrayOf(AppModule::class))
 class DataModule {
+
+    @Singleton
+    @Provides
+    fun preference(context: Context): SharedPreferences =
+            PreferenceManager.getDefaultSharedPreferences(context)
 
     @Singleton
     @Provides

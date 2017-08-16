@@ -15,8 +15,11 @@ import com.karntrehan.nagar.data.entities.CityEntity
 interface CityDao {
 
     @Query("Select * from " + CityEntity.TABLE_NAME + " LIMIT :limit OFFSET :offset")
-    fun loadAllCities(offset: Int, limit: Int): LiveData<List<CityEntity>>
+    fun loadLocalCities(offset: Int, limit: Int): LiveData<List<CityEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAllCities(cities: List<CityEntity>?)
+
+    @Query("Select count(*) from " + CityEntity.TABLE_NAME)
+    fun loadCitiesCount(): Long
 }

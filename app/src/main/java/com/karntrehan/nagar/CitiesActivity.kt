@@ -42,7 +42,6 @@ class CitiesActivity : LifecycleActivity() {
 
         binding.rvCities.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-                //Log.d(TAG, "onScolled")
                 val lastPosition = layoutManager.findLastVisibleItemPosition()
                 if (citiesAdapter.itemCount > 1 && lastPosition == citiesAdapter.itemCount - 1) {
                     citiesViewModel.setInput(lastPosition)
