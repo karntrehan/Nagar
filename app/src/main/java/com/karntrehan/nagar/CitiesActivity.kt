@@ -8,7 +8,6 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
-import android.util.Log
 import com.karntrehan.nagar.databinding.ActivityCitiesBinding
 
 
@@ -22,6 +21,8 @@ class CitiesActivity : LifecycleActivity() {
     internal lateinit var citiesAdapter: CitiesAdapter
     lateinit var context: Context
     lateinit var layoutManager: LinearLayoutManager
+
+    var loadingAlready = true
 
     //private val logger = KotlinLogging.logger {}
     val TAG = "CitiesActivity"
@@ -43,15 +44,21 @@ class CitiesActivity : LifecycleActivity() {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 val lastPosition = layoutManager.findLastVisibleItemPosition()
                 if (citiesAdapter.itemCount > 1 && lastPosition == citiesAdapter.itemCount - 1) {
-                    citiesViewModel.setInput(lastPosition)
+                    if (!loadingAlready)
+                        citiesViewModel.setInput(lastPosition)
+                    loadingAlready = true
                 }
             }
         })
         citiesViewModel.setInput(0)
         citiesViewModel.cities.observe(this, Observer { citiesList ->
-            Log.d(TAG, "citiesList: $citiesList")
-            citiesAdapter.addItems(layoutManager
-                    .findLastVisibleItemPosition(), citiesList)
+            val lastVisi = layoutManager.findLastVisibleItemPosition()
+            loadingAlready = false
+            citiesAdapter.addItems(lastVisi, citiesList)
+
+            if (citiesList?.size ?: 0 < Constants.LIMIT)
+                citiesViewModel.loadFromServer(lastVisi)
+
         })
     }
 }

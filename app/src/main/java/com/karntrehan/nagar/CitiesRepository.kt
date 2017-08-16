@@ -1,7 +1,6 @@
 package com.karntrehan.nagar
 
 import android.arch.lifecycle.LiveData
-import android.content.SharedPreferences
 import android.util.Log
 import com.karntrehan.nagar.data.CityDao
 import com.karntrehan.nagar.data.entities.CitiesResponse
@@ -19,24 +18,21 @@ import javax.inject.Singleton
 @Singleton
 class CitiesRepository @Inject constructor(
         val cityDao: CityDao,
-        val citiesService: CitiesService,
-        val preferences: SharedPreferences
+        val citiesService: CitiesService
 ) : CitiesContract.Repository {
 
     val TAG = "CitiesRepo"
-    val LIMIT = 10
+    var hasLoadedAll: Boolean = false
 
     override fun getCities(offset: Int): LiveData<List<CityEntity>> {
         Log.d(TAG, "Get cities O:$offset")
 
-        if (preferences.getBoolean(Constants.MORE_REMOTE_CITIES, true))
-            getRemoteCities(offset, LIMIT)
+        val result: LiveData<List<CityEntity>> = cityDao.loadLocalCities(offset, Constants.LIMIT)
 
-        val result: LiveData<List<CityEntity>> = cityDao.loadLocalCities(offset, LIMIT)
         return result
     }
 
-    private fun getRemoteCities(offset: Int, limit: Int) {
+    override fun getRemoteCities(offset: Int, limit: Int) {
         Log.d(TAG, "getRemoteCities $offset")
 
         val call: Call<CitiesResponse> = citiesService.getCities(limit, offset)
@@ -51,11 +47,7 @@ class CitiesRepository @Inject constructor(
 
                     Thread(Runnable {
                         cityDao.insertAllCities(citiesResponse.cities)
-                        preferences
-                                .edit()
-                                .putBoolean(Constants.MORE_REMOTE_CITIES,
-                                        citiesResponse.cities.isEmpty())
-                                .apply()
+                        hasLoadedAll = citiesResponse.cities.isEmpty()
                     }).start()
                 }
             }

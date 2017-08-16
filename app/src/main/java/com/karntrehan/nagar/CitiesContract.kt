@@ -9,5 +9,6 @@ import com.karntrehan.nagar.data.entities.CityEntity
 interface CitiesContract {
     interface Repository{
         fun getCities(offset: Int) : LiveData<List<CityEntity>>
+        fun getRemoteCities(offset: Int,limit:Int)
     }
 }

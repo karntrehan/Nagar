@@ -9,5 +9,6 @@ class Constants
         const val API_URL = "https://api.aasaanjobs.com/"
         const val CITIES_API = "api/v4/city/"
         const val MORE_REMOTE_CITIES = "more_remote_cities"
+        const val LIMIT = 10
     }
 }

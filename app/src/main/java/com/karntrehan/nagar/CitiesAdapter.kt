@@ -41,10 +41,7 @@ internal class CitiesAdapter(private val context: Context
             return
 
         this.items.addAll(lastPosition, items)
-
         Log.d(TAG, "List ${this.items}")
-
-        //notifyDataSetChanged()
         notifyItemRangeChanged(lastPosition,this.items.size)
     }
 

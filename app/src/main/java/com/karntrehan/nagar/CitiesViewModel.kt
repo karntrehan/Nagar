@@ -27,5 +27,9 @@ class CitiesViewModel : ViewModel() {
         lastPosition.value = position
     }
 
+    fun  loadFromServer(lastVisi: Int) {
+        citiesRepository.getRemoteCities(lastVisi,Constants.LIMIT)
+    }
+
 
 }
