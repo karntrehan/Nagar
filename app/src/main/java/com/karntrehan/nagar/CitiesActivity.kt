@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import com.karntrehan.nagar.data.entities.LoadingEntity
 import com.karntrehan.nagar.databinding.ActivityCitiesBinding
 
 

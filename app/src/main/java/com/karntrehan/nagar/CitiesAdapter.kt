@@ -2,14 +2,13 @@ package com.karntrehan.nagar
 
 import android.content.Context
 import android.databinding.DataBindingUtil
-import android.provider.ContactsContract.CommonDataKinds.StructuredPostal.CITY
-import android.view.ViewGroup
 import android.support.v7.widget.RecyclerView
 import android.util.Log
-import com.karntrehan.nagar.data.entities.CityEntity
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
+import com.karntrehan.nagar.data.entities.CityEntity
 import com.karntrehan.nagar.data.entities.LoadingEntity
 import com.karntrehan.nagar.databinding.RvCityItemBinding
 import com.karntrehan.nagar.databinding.RvLoadingItemBinding
@@ -18,12 +17,17 @@ import com.karntrehan.nagar.databinding.RvLoadingItemBinding
 /**
  * Created by karn on 14-08-2017.
  */
-internal class CitiesAdapter(private val context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+internal class CitiesAdapter(private val context: Context
+    ,var items: ArrayList<Any> = ArrayList<Any>()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val CITY = 0
     private val LOADING = 1
 
-    private var items = ArrayList<Any>()
+    init {
+        items.add(LoadingEntity())
+    }
+
+
     //private val logger = KotlinLogging.logger {}
     val TAG = "CitiesAdapter"
 
@@ -36,19 +40,12 @@ internal class CitiesAdapter(private val context: Context) : RecyclerView.Adapte
         if (items == null)
             return
 
-        if (lastPosition >= 0) {
-            this.items.removeAt(lastPosition)
-        }
-
-        this.items.addAll(items)
-
-        //Log.d(TAG, "List ${this.items.size}")
-
-        this.items.add(LoadingEntity())
+        this.items.addAll(lastPosition, items)
 
         Log.d(TAG, "List ${this.items}")
 
-        notifyDataSetChanged()
+        //notifyDataSetChanged()
+        notifyItemRangeChanged(lastPosition,this.items.size)
     }
 
     override fun getItemViewType(position: Int): Int {

@@ -4,9 +4,6 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
-import android.util.Log
-import com.karntrehan.nagar.CitiesRepository
-import com.karntrehan.nagar.NagarApplication
 import com.karntrehan.nagar.data.entities.CityEntity
 import javax.inject.Inject
 
