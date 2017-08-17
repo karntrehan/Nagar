@@ -6,7 +6,6 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.databinding.DataBindingUtil
 import android.os.Bundle
-import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -19,10 +18,19 @@ class CitiesActivity : LifecycleActivity() {
     lateinit var cityDao: CityDao*/
 
     lateinit var binding: ActivityCitiesBinding
-    lateinit var citiesViewModel: CitiesViewModel
-    internal lateinit var citiesAdapter: CitiesAdapter
-    lateinit var context: Context
-    lateinit var layoutManager: LinearLayoutManager
+
+    val citiesViewModel: CitiesViewModel by lazy {
+        ViewModelProviders.of(this).get(CitiesViewModel::class.java)
+    }
+
+    internal val citiesAdapter: CitiesAdapter by lazy { CitiesAdapter(context) }
+
+    val context: Context by lazy { this }
+
+    val layoutManager: LinearLayoutManager by lazy {
+        binding.rvCities.layoutManager as LinearLayoutManager
+    }
+
     var canLoadMore = true
 
     //private val logger = KotlinLogging.logger {}
@@ -32,14 +40,8 @@ class CitiesActivity : LifecycleActivity() {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_cities)
         binding.rvCities.setHasFixedSize(true)
-        layoutManager = binding.rvCities.layoutManager as LinearLayoutManager
 
-        context = this
-
-        citiesAdapter = CitiesAdapter(context)
         binding.rvCities.adapter = citiesAdapter
-
-        citiesViewModel = ViewModelProviders.of(this).get(CitiesViewModel::class.java)
 
         binding.rvCities.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
@@ -52,17 +54,25 @@ class CitiesActivity : LifecycleActivity() {
                 }
             }
         })
-        citiesViewModel.setInput(0)
+
         citiesViewModel.cities.observe(this, Observer { citiesList ->
             val lastVisi = layoutManager.findLastVisibleItemPosition()
+
+            if (binding.srlCities.isRefreshing)
+                binding.srlCities.isRefreshing = false
 
             Log.d(TAG, "Got cities: $citiesList")
             if (citiesList != null && citiesList.isNotEmpty()) {
                 canLoadMore = true
-                citiesAdapter.addItems(lastVisi, citiesList)
+                citiesAdapter.addItems(if (lastVisi < 0) 0 else lastVisi, citiesList)
             }
         })
 
+        citiesViewModel.loadStatus.observe(this, Observer { loading ->
+            Log.d(TAG, "Loading $loading")
+            if (!loading!!)
+                citiesAdapter.removeLoader()
+        })
 
         binding.srlCities.setOnRefreshListener({
             Log.d(TAG, "Refresh")
@@ -70,5 +80,10 @@ class CitiesActivity : LifecycleActivity() {
             citiesViewModel.refreshDb()
         })
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        citiesViewModel.setInput(0)
     }
 }

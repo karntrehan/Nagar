@@ -28,8 +28,7 @@ class CitiesRepository @Inject constructor(
     val TAG = "CitiesRepo"
 
     private val offsetLive = MutableLiveData<Int>()
-
-    //private var canCallRemote = true
+    private val loadStatusLive = MutableLiveData<Boolean>()
 
     val cities: LiveData<List<CityEntity>> = Transformations.switchMap(offsetLive)
     { offset ->
@@ -38,16 +37,16 @@ class CitiesRepository @Inject constructor(
 
     override fun getCities(offset: Int): LiveData<List<CityEntity>> {
         offsetLive.value = offset
-
         Thread(Runnable {
+
             val dbCount = cityDao.loadCitiesCount()
             Log.d(TAG, "DB: $dbCount")
             Log.d(TAG, "Prefs: ${preferences.getInt(Constants.MAX_REMOTE_CITIES_COUNT, Int.MAX_VALUE)}")
-            if (offset >= dbCount &&
-                    dbCount <= preferences.getInt(Constants.MAX_REMOTE_CITIES_COUNT, Int.MAX_VALUE)
-            //&& canCallRemote
-                    )
+
+            if (dbCount < preferences.getInt(Constants.MAX_REMOTE_CITIES_COUNT, Int.MAX_VALUE)) {
                 getRemoteCities(offset, Constants.LIMIT)
+            } else if (dbCount <= offset) loadStatusLive.postValue(false)
+
         }).start()
 
         return cities
@@ -56,11 +55,9 @@ class CitiesRepository @Inject constructor(
     override fun getRemoteCities(offset: Int, limit: Int) {
         Log.d(TAG, "getRemoteCities $offset")
 
-        //canCallRemote = false
         val call: Call<CitiesResponse> = citiesService.getCities(limit, offset)
         call.enqueue(object : Callback<CitiesResponse> {
             override fun onResponse(call: Call<CitiesResponse>?, response: Response<CitiesResponse>?) {
-                //canCallRemote = true
                 if (response!!.isSuccessful) {
                     val citiesResponse = response.body()
                     Log.d(TAG, "Success: " + citiesResponse.toString())
@@ -75,12 +72,12 @@ class CitiesRepository @Inject constructor(
                                 .putInt(Constants.MAX_REMOTE_CITIES_COUNT,
                                         citiesResponse.cMetaResponse.totalCount)
                                 .apply()
+                        //loadStatusLive.postValue(citiesResponse.cities.isEmpty())
                     }).start()
                 }
             }
 
             override fun onFailure(call: Call<CitiesResponse>?, t: Throwable?) {
-                //canCallRemote = true
                 Log.d(TAG, "Failure: " + t?.localizedMessage)
             }
 
@@ -93,4 +90,9 @@ class CitiesRepository @Inject constructor(
             cityDao.deleteAll()
         }).start()
     }
+
+    override fun getLoadingStatus(position: Int?): LiveData<Boolean> {
+        return loadStatusLive
+    }
+
 }

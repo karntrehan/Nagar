@@ -17,14 +17,14 @@ import com.karntrehan.nagar.databinding.RvLoadingItemBinding
 /**
  * Created by karn on 14-08-2017.
  */
-internal class CitiesAdapter(private val context: Context
-                             , var items: ArrayList<Any> = ArrayList<Any>()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+class CitiesAdapter(private val context: Context
+                    , val items: ArrayList<Any> = ArrayList<Any>()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val CITY = 0
     private val LOADING = 1
 
     init {
-        items.add(LoadingEntity())
+        addLoadingView()
     }
 
 
@@ -36,10 +36,29 @@ internal class CitiesAdapter(private val context: Context
         return this.items.size
     }
 
-    fun addItems(lastPosition: Int, items: List<CityEntity>) {
-        this.items.addAll(lastPosition, items)
+    fun addItems(lastPosition: Int, cities: List<CityEntity>) {
+        items.addAll(lastPosition, cities)
         Log.d(TAG, "List ${this.items}")
-        notifyItemRangeChanged(lastPosition, this.items.size)
+        notifyItemRangeChanged(lastPosition, items.size)
+    }
+
+    fun removeLoader() {
+        val toRemove = items.size - 1
+        if (items[toRemove] is LoadingEntity) {
+            items.removeAt(toRemove)
+            notifyItemRemoved(toRemove)
+        }
+    }
+
+    fun addLoadingView() {
+        items.add(LoadingEntity())
+    }
+
+
+    fun clearAll() {
+        items.clear()
+        addLoadingView()
+        notifyDataSetChanged()
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -90,16 +109,12 @@ internal class CitiesAdapter(private val context: Context
         val cityEntity = items[position] as CityEntity
         vh1.binding.tvCityName.text = cityEntity.name
         vh1.binding.llCity.setOnClickListener({
-            Toast.makeText(context, "You clicked on " + cityEntity.name, Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Selection is - " + cityEntity.name, Toast.LENGTH_LONG).show()
         })
     }
 
     class CityHolder(val binding: RvCityItemBinding) : RecyclerView.ViewHolder(binding.root)
     class LoadingHolder(val binding: RvLoadingItemBinding) : RecyclerView.ViewHolder(binding.root)
 
-    fun clearAll() {
-        this.items.clear()
-        items.add(LoadingEntity())
-        notifyDataSetChanged()
-    }
+
 }

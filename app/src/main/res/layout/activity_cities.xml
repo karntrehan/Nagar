@@ -4,20 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.karntrehan.nagar.CitiesActivity">
 
+
     <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/srlCities"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/srlCities">
+        android:layout_height="match_parent">
 
         <android.support.v7.widget.RecyclerView
+            android:id="@+id/rvCities"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layoutManager="LinearLayoutManager"
             android:overScrollMode="never"
-            android:id="@+id/rvCities"
-            />
-
+            app:layoutManager="LinearLayoutManager" />
 
     </android.support.v4.widget.SwipeRefreshLayout>
+
 
 </layout>
