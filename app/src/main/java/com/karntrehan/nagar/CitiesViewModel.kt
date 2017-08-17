@@ -27,6 +27,11 @@ class CitiesViewModel : ViewModel() {
         citiesRepository.getLoadingStatus(position)
     }
 
+    val errorStatus : LiveData<String> = Transformations.switchMap(lastPosition)
+    { position ->
+        citiesRepository.getErrorStatus(position)
+    }
+
 
     fun setInput(position: Int) {
         lastPosition.value = position

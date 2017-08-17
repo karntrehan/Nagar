@@ -12,5 +12,6 @@ interface CitiesContract {
         fun getRemoteCities(offset: Int, limit: Int)
         fun deleteCities()
         fun getLoadingStatus(position: Int?): LiveData<Boolean>
+        fun getErrorStatus(position: Int?): LiveData<String>
     }
 }

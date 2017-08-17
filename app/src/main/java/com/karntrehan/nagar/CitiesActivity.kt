@@ -9,6 +9,7 @@ import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
+import android.widget.Toast
 import com.karntrehan.nagar.databinding.ActivityCitiesBinding
 
 
@@ -58,8 +59,7 @@ class CitiesActivity : LifecycleActivity() {
         citiesViewModel.cities.observe(this, Observer { citiesList ->
             val lastVisi = layoutManager.findLastVisibleItemPosition()
 
-            if (binding.srlCities.isRefreshing)
-                binding.srlCities.isRefreshing = false
+            hideSRLLoader()
 
             Log.d(TAG, "Got cities: $citiesList")
             if (citiesList != null && citiesList.isNotEmpty()) {
@@ -74,12 +74,24 @@ class CitiesActivity : LifecycleActivity() {
                 citiesAdapter.removeLoader()
         })
 
+
+        citiesViewModel.errorStatus.observe(this, Observer { errorStatus ->
+            citiesAdapter.removeLoader()
+            hideSRLLoader()
+            Toast.makeText(context, errorStatus, Toast.LENGTH_LONG).show()
+        })
+
         binding.srlCities.setOnRefreshListener({
             Log.d(TAG, "Refresh")
             citiesAdapter.clearAll()
             citiesViewModel.refreshDb()
         })
 
+    }
+
+    private fun hideSRLLoader() {
+        if (binding.srlCities.isRefreshing)
+            binding.srlCities.isRefreshing = false
     }
 
     override fun onResume() {

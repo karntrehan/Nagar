@@ -18,7 +18,8 @@ import com.karntrehan.nagar.databinding.RvLoadingItemBinding
  * Created by karn on 14-08-2017.
  */
 class CitiesAdapter(private val context: Context
-                    , val items: ArrayList<Any> = ArrayList<Any>()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+                    , val items: ArrayList<Any> = ArrayList<Any>())
+    : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val CITY = 0
     private val LOADING = 1

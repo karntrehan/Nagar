@@ -11,6 +11,7 @@ import com.karntrehan.nagar.data.entities.CityEntity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -29,6 +30,7 @@ class CitiesRepository @Inject constructor(
 
     private val offsetLive = MutableLiveData<Int>()
     private val loadStatusLive = MutableLiveData<Boolean>()
+    private val errorStatusLive = MutableLiveData<String>()
 
     val cities: LiveData<List<CityEntity>> = Transformations.switchMap(offsetLive)
     { offset ->
@@ -74,11 +76,13 @@ class CitiesRepository @Inject constructor(
                                 .apply()
                         //loadStatusLive.postValue(citiesResponse.cities.isEmpty())
                     }).start()
-                }
+                } else errorStatusLive.postValue("Error! Server returned: ${response.code()}")
             }
 
             override fun onFailure(call: Call<CitiesResponse>?, t: Throwable?) {
-                Log.d(TAG, "Failure: " + t?.localizedMessage)
+                if (t is IOException)
+                    errorStatusLive.postValue("Error! Please check internet connection!")
+                else errorStatusLive.postValue("Error. ${t?.localizedMessage ?: "Unknown"}")
             }
 
         })
@@ -93,6 +97,10 @@ class CitiesRepository @Inject constructor(
 
     override fun getLoadingStatus(position: Int?): LiveData<Boolean> {
         return loadStatusLive
+    }
+
+    override fun getErrorStatus(position: Int?): LiveData<String> {
+        return errorStatusLive
     }
 
 }
