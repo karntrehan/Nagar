@@ -1,10 +1,12 @@
-package com.karntrehan.nagar
+package com.karntrehan.nagar.cities.viewmodel
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.arch.lifecycle.ViewModel
-import com.karntrehan.nagar.data.entities.CityEntity
+import com.karntrehan.nagar.cities.repo.CitiesRepository
+import com.karntrehan.nagar.NagarApplication
+import com.karntrehan.nagar.cities.entities.CityEntity
 import javax.inject.Inject
 
 class CitiesViewModel : ViewModel() {

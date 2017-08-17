@@ -1,4 +1,4 @@
-package com.karntrehan.nagar
+package com.karntrehan.nagar.util
 
 /**
  * Created by karn on 13-08-2017.

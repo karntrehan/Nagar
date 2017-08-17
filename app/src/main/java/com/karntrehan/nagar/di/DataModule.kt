@@ -4,7 +4,7 @@ import android.arch.persistence.room.Room
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import com.karntrehan.nagar.data.NagarDb
+import com.karntrehan.nagar.db.NagarDb
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton

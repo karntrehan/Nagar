@@ -3,8 +3,8 @@ package com.karntrehan.nagar.di
 import android.content.Context
 import com.facebook.stetho.okhttp3.StethoInterceptor
 import com.karntrehan.nagar.BuildConfig
-import com.karntrehan.nagar.CitiesService
-import com.karntrehan.nagar.Constants
+import com.karntrehan.nagar.cities.repo.api.CitiesAPI
+import com.karntrehan.nagar.util.Constants
 import dagger.Module
 import dagger.Provides
 import okhttp3.Cache
@@ -54,7 +54,7 @@ class NetworkModule {
 
     @Provides
     @Singleton
-    fun citiesService(retrofit: Retrofit): CitiesService =
-            retrofit.create(CitiesService::class.java)
+    fun citiesService(retrofit: Retrofit): CitiesAPI =
+            retrofit.create(CitiesAPI::class.java)
 }
 

@@ -1,13 +1,16 @@
-package com.karntrehan.nagar
+package com.karntrehan.nagar.cities.repo
 
 import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.content.SharedPreferences
 import android.util.Log
-import com.karntrehan.nagar.data.CityDao
-import com.karntrehan.nagar.data.entities.CitiesResponse
-import com.karntrehan.nagar.data.entities.CityEntity
+import com.karntrehan.nagar.cities.CitiesContract
+import com.karntrehan.nagar.cities.repo.api.CitiesAPI
+import com.karntrehan.nagar.util.Constants
+import com.karntrehan.nagar.db.CityDao
+import com.karntrehan.nagar.cities.entities.CitiesResponse
+import com.karntrehan.nagar.cities.entities.CityEntity
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -22,7 +25,7 @@ import javax.inject.Singleton
 @Singleton
 class CitiesRepository @Inject constructor(
         val cityDao: CityDao,
-        val citiesService: CitiesService,
+        val citiesService: CitiesAPI,
         val preferences: SharedPreferences
 ) : CitiesContract.Repository {
 

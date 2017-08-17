@@ -1,4 +1,4 @@
-package com.karntrehan.nagar.data.entities
+package com.karntrehan.nagar.cities.entities
 
 import android.arch.persistence.room.Entity
 import android.arch.persistence.room.PrimaryKey

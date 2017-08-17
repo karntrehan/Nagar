@@ -1,7 +1,7 @@
-package com.karntrehan.nagar
+package com.karntrehan.nagar.cities
 
 import android.arch.lifecycle.LiveData
-import com.karntrehan.nagar.data.entities.CityEntity
+import com.karntrehan.nagar.cities.entities.CityEntity
 
 /**
  * Created by karn on 14-08-2017.

@@ -1,4 +1,4 @@
-package com.karntrehan.nagar
+package com.karntrehan.nagar.cities
 
 import android.arch.lifecycle.LifecycleActivity
 import android.arch.lifecycle.Observer
@@ -10,13 +10,12 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.widget.Toast
+import com.karntrehan.nagar.R
 import com.karntrehan.nagar.databinding.ActivityCitiesBinding
+import com.karntrehan.nagar.cities.viewmodel.CitiesViewModel
 
 
 class CitiesActivity : LifecycleActivity() {
-
-    /*@Inject
-    lateinit var cityDao: CityDao*/
 
     lateinit var binding: ActivityCitiesBinding
 
@@ -34,7 +33,6 @@ class CitiesActivity : LifecycleActivity() {
 
     var canLoadMore = true
 
-    //private val logger = KotlinLogging.logger {}
     val TAG = "CitiesActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {

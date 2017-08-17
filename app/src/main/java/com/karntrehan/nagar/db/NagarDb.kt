@@ -1,8 +1,8 @@
-package com.karntrehan.nagar.data
+package com.karntrehan.nagar.db
 
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.RoomDatabase
-import com.karntrehan.nagar.data.entities.CityEntity
+import com.karntrehan.nagar.cities.entities.CityEntity
 
 /**
  * Created by karn on 13-08-2017.

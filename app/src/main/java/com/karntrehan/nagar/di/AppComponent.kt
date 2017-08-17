@@ -1,6 +1,6 @@
 package com.karntrehan.nagar.di
 
-import com.karntrehan.nagar.CitiesViewModel
+import com.karntrehan.nagar.cities.viewmodel.CitiesViewModel
 import dagger.Component
 import javax.inject.Singleton
 

@@ -1,4 +1,4 @@
-package com.karntrehan.nagar
+package com.karntrehan.nagar.cities
 
 import android.content.Context
 import android.databinding.DataBindingUtil
@@ -8,8 +8,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.karntrehan.nagar.data.entities.CityEntity
-import com.karntrehan.nagar.data.entities.LoadingEntity
+import com.karntrehan.nagar.R
+import com.karntrehan.nagar.cities.entities.CityEntity
+import com.karntrehan.nagar.cities.entities.LoadingEntity
 import com.karntrehan.nagar.databinding.RvCityItemBinding
 import com.karntrehan.nagar.databinding.RvLoadingItemBinding
 
@@ -27,7 +28,6 @@ class CitiesAdapter(private val context: Context
     init {
         addLoadingView()
     }
-
 
     //private val logger = KotlinLogging.logger {}
     val TAG = "CitiesAdapter"
@@ -54,7 +54,6 @@ class CitiesAdapter(private val context: Context
     fun addLoadingView() {
         items.add(LoadingEntity())
     }
-
 
     fun clearAll() {
         items.clear()
