@@ -13,6 +13,7 @@ class CitiesViewModel : ViewModel() {
 
     init {
         NagarApplication.appComponent.inject(this)
+        citiesRepository.saveCities()
     }
 
     val TAG = "CitiesViewModel"
@@ -26,10 +27,4 @@ class CitiesViewModel : ViewModel() {
     fun setInput(position: Int) {
         lastPosition.value = position
     }
-
-    fun  loadFromServer(lastVisi: Int) {
-        citiesRepository.getRemoteCities(lastVisi,Constants.LIMIT)
-    }
-
-
 }

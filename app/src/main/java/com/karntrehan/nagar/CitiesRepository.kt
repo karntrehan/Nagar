@@ -1,6 +1,9 @@
 package com.karntrehan.nagar
 
 import android.arch.lifecycle.LiveData
+import android.arch.lifecycle.MutableLiveData
+import android.arch.lifecycle.Transformations
+import android.content.SharedPreferences
 import android.util.Log
 import com.karntrehan.nagar.data.CityDao
 import com.karntrehan.nagar.data.entities.CitiesResponse
@@ -18,26 +21,45 @@ import javax.inject.Singleton
 @Singleton
 class CitiesRepository @Inject constructor(
         val cityDao: CityDao,
-        val citiesService: CitiesService
+        val citiesService: CitiesService,
+        val preferences: SharedPreferences
 ) : CitiesContract.Repository {
 
     val TAG = "CitiesRepo"
-    var hasLoadedAll: Boolean = false
+
+    private val offsetLive = MutableLiveData<Int>()
+
+    private var canCallRemote = true
+
+    val cities: LiveData<List<CityEntity>> = Transformations.switchMap(offsetLive)
+    { offset ->
+        cityDao.loadLocalCities(offset, Constants.LIMIT)
+    }
 
     override fun getCities(offset: Int): LiveData<List<CityEntity>> {
-        Log.d(TAG, "Get cities O:$offset")
+        offsetLive.value = offset
 
-        val result: LiveData<List<CityEntity>> = cityDao.loadLocalCities(offset, Constants.LIMIT)
+        Thread(Runnable {
+            val dbCount = cityDao.loadCitiesCount()
+            Log.d(TAG, "DB: $dbCount")
+            Log.d(TAG, "Prefs: ${preferences.getInt(Constants.MAX_REMOTE_CITIES_COUNT, Int.MAX_VALUE)}")
+            if (offset >= dbCount &&
+                    dbCount <= preferences.getInt(Constants.MAX_REMOTE_CITIES_COUNT, Int.MAX_VALUE)
+                    && canCallRemote)
+                getRemoteCities(offset, Constants.LIMIT)
+        }).start()
 
-        return result
+        return cities
     }
 
     override fun getRemoteCities(offset: Int, limit: Int) {
         Log.d(TAG, "getRemoteCities $offset")
 
+        canCallRemote = false
         val call: Call<CitiesResponse> = citiesService.getCities(limit, offset)
         call.enqueue(object : Callback<CitiesResponse> {
             override fun onResponse(call: Call<CitiesResponse>?, response: Response<CitiesResponse>?) {
+                canCallRemote = true
                 if (response!!.isSuccessful) {
                     val citiesResponse = response.body()
                     Log.d(TAG, "Success: " + citiesResponse.toString())
@@ -47,15 +69,31 @@ class CitiesRepository @Inject constructor(
 
                     Thread(Runnable {
                         cityDao.insertAllCities(citiesResponse.cities)
-                        hasLoadedAll = citiesResponse.cities.isEmpty()
+                        preferences
+                                .edit()
+                                .putInt(Constants.MAX_REMOTE_CITIES_COUNT,
+                                        citiesResponse.cMetaResponse.totalCount)
+                                .apply()
                     }).start()
                 }
             }
 
             override fun onFailure(call: Call<CitiesResponse>?, t: Throwable?) {
+                canCallRemote = true
                 Log.d(TAG, "Failure: " + t?.localizedMessage)
             }
 
         })
+    }
+
+
+    //FIXME remove
+    fun saveCities() {
+        /*Thread(Runnable {
+            val cities = ArrayList<CityEntity>()
+            for (i in 1..100)
+                cities.add(CityEntity(i, "City $i", "Slug $i"))
+            cityDao.insertAllCities(cities)
+        }).start()*/
     }
 }

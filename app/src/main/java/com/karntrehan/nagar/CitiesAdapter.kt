@@ -36,10 +36,7 @@ internal class CitiesAdapter(private val context: Context
         return this.items.size
     }
 
-    fun addItems(lastPosition: Int, items: List<CityEntity>?) {
-        if (items == null)
-            return
-
+    fun addItems(lastPosition: Int, items: List<CityEntity>) {
         this.items.addAll(lastPosition, items)
         Log.d(TAG, "List ${this.items}")
         notifyItemRangeChanged(lastPosition,this.items.size)

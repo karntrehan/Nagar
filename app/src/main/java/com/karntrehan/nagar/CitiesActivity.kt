@@ -8,6 +8,7 @@ import android.databinding.DataBindingUtil
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import com.karntrehan.nagar.databinding.ActivityCitiesBinding
 
 
@@ -21,8 +22,7 @@ class CitiesActivity : LifecycleActivity() {
     internal lateinit var citiesAdapter: CitiesAdapter
     lateinit var context: Context
     lateinit var layoutManager: LinearLayoutManager
-
-    var loadingAlready = true
+    var canLoadMore = true
 
     //private val logger = KotlinLogging.logger {}
     val TAG = "CitiesActivity"
@@ -43,22 +43,23 @@ class CitiesActivity : LifecycleActivity() {
         binding.rvCities.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
                 val lastPosition = layoutManager.findLastVisibleItemPosition()
-                if (citiesAdapter.itemCount > 1 && lastPosition == citiesAdapter.itemCount - 1) {
-                    if (!loadingAlready)
-                        citiesViewModel.setInput(lastPosition)
-                    loadingAlready = true
+                if (citiesAdapter.itemCount > 1 && lastPosition == citiesAdapter.itemCount - 1
+                        && canLoadMore) {
+                    Log.d(TAG, "Load more $lastPosition")
+                    citiesViewModel.setInput(lastPosition)
+                    canLoadMore = false
                 }
             }
         })
         citiesViewModel.setInput(0)
         citiesViewModel.cities.observe(this, Observer { citiesList ->
             val lastVisi = layoutManager.findLastVisibleItemPosition()
-            loadingAlready = false
-            citiesAdapter.addItems(lastVisi, citiesList)
 
-            if (citiesList?.size ?: 0 < Constants.LIMIT)
-                citiesViewModel.loadFromServer(lastVisi)
-
+            Log.d(TAG, "Got cities: $citiesList")
+            if (citiesList != null && citiesList.isNotEmpty()) {
+                canLoadMore = true
+                citiesAdapter.addItems(lastVisi, citiesList)
+            }
         })
     }
 }
