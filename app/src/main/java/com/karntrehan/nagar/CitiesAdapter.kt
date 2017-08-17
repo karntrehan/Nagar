@@ -18,7 +18,7 @@ import com.karntrehan.nagar.databinding.RvLoadingItemBinding
  * Created by karn on 14-08-2017.
  */
 internal class CitiesAdapter(private val context: Context
-    ,var items: ArrayList<Any> = ArrayList<Any>()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+                             , var items: ArrayList<Any> = ArrayList<Any>()) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val CITY = 0
     private val LOADING = 1
@@ -39,7 +39,7 @@ internal class CitiesAdapter(private val context: Context
     fun addItems(lastPosition: Int, items: List<CityEntity>) {
         this.items.addAll(lastPosition, items)
         Log.d(TAG, "List ${this.items}")
-        notifyItemRangeChanged(lastPosition,this.items.size)
+        notifyItemRangeChanged(lastPosition, this.items.size)
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -96,4 +96,10 @@ internal class CitiesAdapter(private val context: Context
 
     class CityHolder(val binding: RvCityItemBinding) : RecyclerView.ViewHolder(binding.root)
     class LoadingHolder(val binding: RvLoadingItemBinding) : RecyclerView.ViewHolder(binding.root)
+
+    fun clearAll() {
+        this.items.clear()
+        items.add(LoadingEntity())
+        notifyDataSetChanged()
+    }
 }

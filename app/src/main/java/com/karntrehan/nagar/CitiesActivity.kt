@@ -6,6 +6,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.databinding.DataBindingUtil
 import android.os.Bundle
+import android.support.v4.widget.SwipeRefreshLayout
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.Log
@@ -61,5 +62,13 @@ class CitiesActivity : LifecycleActivity() {
                 citiesAdapter.addItems(lastVisi, citiesList)
             }
         })
+
+
+        binding.srlCities.setOnRefreshListener({
+            Log.d(TAG, "Refresh")
+            citiesAdapter.clearAll()
+            citiesViewModel.refreshDb()
+        })
+
     }
 }

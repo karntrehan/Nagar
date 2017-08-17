@@ -13,7 +13,6 @@ class CitiesViewModel : ViewModel() {
 
     init {
         NagarApplication.appComponent.inject(this)
-        citiesRepository.saveCities()
     }
 
     val TAG = "CitiesViewModel"
@@ -26,5 +25,10 @@ class CitiesViewModel : ViewModel() {
 
     fun setInput(position: Int) {
         lastPosition.value = position
+    }
+
+    fun refreshDb() {
+        citiesRepository.deleteCities()
+        lastPosition.value = 0
     }
 }

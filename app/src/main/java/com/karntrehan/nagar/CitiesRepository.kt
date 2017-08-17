@@ -29,7 +29,7 @@ class CitiesRepository @Inject constructor(
 
     private val offsetLive = MutableLiveData<Int>()
 
-    private var canCallRemote = true
+    //private var canCallRemote = true
 
     val cities: LiveData<List<CityEntity>> = Transformations.switchMap(offsetLive)
     { offset ->
@@ -45,7 +45,8 @@ class CitiesRepository @Inject constructor(
             Log.d(TAG, "Prefs: ${preferences.getInt(Constants.MAX_REMOTE_CITIES_COUNT, Int.MAX_VALUE)}")
             if (offset >= dbCount &&
                     dbCount <= preferences.getInt(Constants.MAX_REMOTE_CITIES_COUNT, Int.MAX_VALUE)
-                    && canCallRemote)
+            //&& canCallRemote
+                    )
                 getRemoteCities(offset, Constants.LIMIT)
         }).start()
 
@@ -55,11 +56,11 @@ class CitiesRepository @Inject constructor(
     override fun getRemoteCities(offset: Int, limit: Int) {
         Log.d(TAG, "getRemoteCities $offset")
 
-        canCallRemote = false
+        //canCallRemote = false
         val call: Call<CitiesResponse> = citiesService.getCities(limit, offset)
         call.enqueue(object : Callback<CitiesResponse> {
             override fun onResponse(call: Call<CitiesResponse>?, response: Response<CitiesResponse>?) {
-                canCallRemote = true
+                //canCallRemote = true
                 if (response!!.isSuccessful) {
                     val citiesResponse = response.body()
                     Log.d(TAG, "Success: " + citiesResponse.toString())
@@ -79,7 +80,7 @@ class CitiesRepository @Inject constructor(
             }
 
             override fun onFailure(call: Call<CitiesResponse>?, t: Throwable?) {
-                canCallRemote = true
+                //canCallRemote = true
                 Log.d(TAG, "Failure: " + t?.localizedMessage)
             }
 
@@ -87,13 +88,9 @@ class CitiesRepository @Inject constructor(
     }
 
 
-    //FIXME remove
-    fun saveCities() {
-        /*Thread(Runnable {
-            val cities = ArrayList<CityEntity>()
-            for (i in 1..100)
-                cities.add(CityEntity(i, "City $i", "Slug $i"))
-            cityDao.insertAllCities(cities)
-        }).start()*/
+    override fun deleteCities() {
+        Thread(Runnable {
+            cityDao.deleteAll()
+        }).start()
     }
 }

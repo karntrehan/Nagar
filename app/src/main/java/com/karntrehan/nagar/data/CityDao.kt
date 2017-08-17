@@ -21,4 +21,7 @@ interface CityDao {
 
     @Query("Select count(*) from " + CityEntity.TABLE_NAME)
     fun loadCitiesCount(): Long
+
+    @Query("DELETE FROM " + CityEntity.TABLE_NAME)
+    fun deleteAll()
 }
