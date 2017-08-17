@@ -4,13 +4,12 @@ import android.arch.lifecycle.LiveData
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.Transformations
 import android.content.SharedPreferences
-import android.util.Log
 import com.karntrehan.nagar.cities.CitiesContract
-import com.karntrehan.nagar.cities.repo.api.CitiesAPI
-import com.karntrehan.nagar.util.Constants
-import com.karntrehan.nagar.db.CityDao
 import com.karntrehan.nagar.cities.entities.CitiesResponse
 import com.karntrehan.nagar.cities.entities.CityEntity
+import com.karntrehan.nagar.cities.repo.api.CitiesAPI
+import com.karntrehan.nagar.db.CityDao
+import com.karntrehan.nagar.util.Constants
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -29,7 +28,6 @@ class CitiesRepository @Inject constructor(
         val preferences: SharedPreferences
 ) : CitiesContract.Repository {
 
-    val TAG = "CitiesRepo"
 
     private val offsetLive = MutableLiveData<Int>()
     private val loadStatusLive = MutableLiveData<Boolean>()
@@ -43,33 +41,24 @@ class CitiesRepository @Inject constructor(
     override fun getCities(offset: Int): LiveData<List<CityEntity>> {
         offsetLive.value = offset
         Thread(Runnable {
-
             val dbCount = cityDao.loadCitiesCount()
-            Log.d(TAG, "DB: $dbCount")
-            Log.d(TAG, "Prefs: ${preferences.getInt(Constants.MAX_REMOTE_CITIES_COUNT, Int.MAX_VALUE)}")
-
+            //If the db count is less than the max remote cities count received from API,
+            // run a remote query
             if (dbCount < preferences.getInt(Constants.MAX_REMOTE_CITIES_COUNT, Int.MAX_VALUE)) {
                 getRemoteCities(offset, Constants.LIMIT)
             } else if (dbCount <= offset) loadStatusLive.postValue(false)
-
         }).start()
 
         return cities
     }
 
     override fun getRemoteCities(offset: Int, limit: Int) {
-        Log.d(TAG, "getRemoteCities $offset")
 
         val call: Call<CitiesResponse> = citiesService.getCities(limit, offset)
         call.enqueue(object : Callback<CitiesResponse> {
             override fun onResponse(call: Call<CitiesResponse>?, response: Response<CitiesResponse>?) {
                 if (response!!.isSuccessful) {
-                    val citiesResponse = response.body()
-                    Log.d(TAG, "Success: " + citiesResponse.toString())
-
-                    if (citiesResponse == null)
-                        return
-
+                    val citiesResponse = response.body() ?: return
                     Thread(Runnable {
                         cityDao.insertAllCities(citiesResponse.cities)
                         preferences
@@ -77,7 +66,6 @@ class CitiesRepository @Inject constructor(
                                 .putInt(Constants.MAX_REMOTE_CITIES_COUNT,
                                         citiesResponse.cMetaResponse.totalCount)
                                 .apply()
-                        //loadStatusLive.postValue(citiesResponse.cities.isEmpty())
                     }).start()
                 } else errorStatusLive.postValue("Error! Server returned: ${response.code()}")
             }

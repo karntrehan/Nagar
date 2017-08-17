@@ -1,7 +1,7 @@
 package com.karntrehan.nagar.cities.repo.api
 
-import com.karntrehan.nagar.util.Constants
 import com.karntrehan.nagar.cities.entities.CitiesResponse
+import com.karntrehan.nagar.util.Constants
 import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
